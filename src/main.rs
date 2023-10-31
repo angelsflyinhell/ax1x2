@@ -7,12 +7,15 @@ struct KeyPair {
 }
 
 fn main() {
-    println!("Diffie-Hellman key exchange");
+    std::env::set_var("RUST_LOG", "debug");
+    env_logger::init();
+
+    log::info!("Diffie-Hellman key exchange");
     let time_start = std::time::Instant::now();
 
     let p = get_prime();
     let g = get_prime();
-    println!("p: {}, g: {}", p, g);
+    log::info!("p: {}, g: {}", p, g);
 
     // Alice and Bob or whatever, just 2 clients communicating
     let client_one = KeyPair {
@@ -20,30 +23,30 @@ fn main() {
         public_key_g: g,
         private_key: get_prime(),
     };
-    println!("Client 1 private key: {}", client_one.private_key);
+    log::info!("Client 1 private key: {}", client_one.private_key);
 
     let client_two = KeyPair {
         public_key_p: p,
         public_key_g: g,
         private_key: get_prime(),
     };
-    println!("Client 2 private key: {}", client_two.private_key);
+    log::info!("Client 2 private key: {}", client_two.private_key);
 
     // generate shared key
     let shared_key_one = generate_shared_key(&client_one);
-    println!("Client 1 shared key: {}", shared_key_one);
+    log::info!("Client 1 shared key: {}", shared_key_one);
 
     let shared_key_two = generate_shared_key(&client_two);
-    println!("Client 2 shared key: {}", shared_key_two);
+    log::info!("Client 2 shared key: {}", shared_key_two);
 
     // generate result key (should be the same for both clients)
     let result_key_one = generate_result_key(shared_key_two, &client_one);
-    println!("Client 1 result key: {}", result_key_one);
+    log::info!("Client 1 result key: {}", result_key_one);
 
     let result_key_two = generate_result_key(shared_key_one, &client_two);
-    println!("Client 2 result key: {}", result_key_two);
+    log::info!("Client 2 result key: {}", result_key_two);
 
-    println!("took {}ms since start", time_start.elapsed().as_millis());
+    log::info!("took {}ms since start", time_start.elapsed().as_millis());
 }
 
 fn generate_shared_key(client: &KeyPair) -> BigInt {
@@ -58,7 +61,8 @@ fn generate_result_key(shared_key: BigInt, client: &KeyPair) -> BigInt {
 fn get_prime() -> usize {
     let mut prime: usize;
     loop {
-        prime = rand::random::<i8>() as usize;
+        prime = rand::random::<u8>() as usize;
+        log::debug!("prime: {}", prime);
         if is_prime_number(prime) {
             break;
         }
@@ -87,6 +91,7 @@ fn bigint_pow(mut base: BigInt, mut exponent: usize) -> BigInt {
         }
         exponent >>= 1;
         base *= base.clone();
+        log::debug!("power: {}", result);
     }
     return result;
 }
