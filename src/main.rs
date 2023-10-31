@@ -7,7 +7,7 @@ struct KeyPair {
 }
 
 fn main() {
-    std::env::set_var("RUST_LOG", "debug");
+    std::env::set_var("RUST_LOG", "info");
     env_logger::init();
 
     log::info!("Diffie-Hellman key exchange");
